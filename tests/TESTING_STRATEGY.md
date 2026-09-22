@@ -26,4 +26,17 @@ A **Test Plan** defines scope, cases and entry/exit criteria. A **separate Test 
 
 These are **portfolio examples of expected checks**, not additional claimed passes.
 
+## Scheduled Practice Log checks
+
+| ID | Scenario | Required result |
+|---|---|---|
+| DAILY-01 | Today's card already exists | Do not create a duplicate |
+| DAILY-02 | Previous card contains an actual “next practice decision” | Retain and prioritise it over older plans |
+| DAILY-03 | No actual progress was recorded | State this and avoid claiming a new level of mastery |
+| DAILY-04 | Pre-session draft | Current active Template headings, instruction paragraph and table shape present |
+| DAILY-05 | Post-session area | Actual time, progress, problems, results and next decision remain for user entry |
+| DAILY-06 | MCP write completes | Read back content, native tables, properties and Repertoire relation/mention |
+
+These cases describe expected behaviour. The 2026-09-22 format deviation is documented in [results](TEST_RESULTS.md); this table is not a passed test report.
+
 Run the small offline demo with `python -m unittest discover -s tests -v`. Its seven tests cover a reduced Repertoire validator and generic active/legacy selection. They do not test live Musiklernen routing or MCP.
