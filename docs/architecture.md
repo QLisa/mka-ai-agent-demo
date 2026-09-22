@@ -1,62 +1,55 @@
-# System Architecture
+# Architecture and routing
 
-## Design goals
+**Reference snapshot:** MKA Index v2.10, Test Governance v1.3 and Musiklernen Structure v1.0, read 2026-09-22 from active Heptabase cards.
 
-MKA was designed to keep an expanding knowledge system consistent without loading every rule for every request. The architecture separates shared rules, card-type-specific standards, generation, validation and persistence.
-
-## Processing flow
-
-```mermaid
-flowchart TD
-    I["User intent"] --> C["Intent classification"]
-    C --> R["Module router"]
-    R --> L["Rule selection"]
-    L --> D["Draft generation"]
-    D --> Q["Final QA"]
-    Q -->|"Pass"| W["MCP write"]
-    Q -->|"Fail"| X["Correction loop"]
-    X --> D
-    W --> P["Post-write check"]
-```
-
-## Components
-
-| Component | Responsibility |
+| Part | Responsibility |
 |---|---|
-| Intent classifier | Determines whether the request concerns repertoire, musicians, music history or a log workflow. |
-| Module router | Selects the applicable module and prevents unrelated standards from being loaded. |
-| Core standards | Provides shared naming, metadata, relation and lifecycle rules. |
-| Module standards | Defines required sections and rules for one supported card type. |
-| Generator | Produces the draft content and metadata from the request and retrieved context. |
-| QA layer | Checks structure, approved values, relations and consistency before persistence. |
-| MCP adapter | Searches, creates and updates cards in Heptabase. |
-| Post-write verifier | Re-reads the stored result and checks whether the intended structure was persisted. |
+| MKA Index | Sole active entry point; selects active modules by request and resolves precedence. Contains routing, not detailed card rules. |
+| Core / Core QA | Shared execution, sources, safety, naming checks, reporting and verification. |
+| Structure | Domain model, card boundaries, properties and relationships. |
+| Standard | Behaviour and content requirements for the applicable card type. |
+| Template | Formal output structure where an active route defines one. |
+| QA | Checks a concrete draft or card; does not create rules. |
+| Tests / Test Governance | Regression cases, selection, Test Plan, Test Report and activation decision. Not loaded for routine builds. |
+| MCP interaction | Searches and changes Heptabase objects, then reads persisted content and properties back. |
 
-## Rule routing
+## Request routing
 
 ```mermaid
 flowchart TD
-    R["Module router"] --> C["Core standards"]
-    R --> P["Repertoire"]
-    R --> M["Musician"]
-    R --> H["Music history"]
-    R --> L["Practice and lesson logs"]
+    A["Read active Index"] --> B{"Task?"}
+    B -->|search/review| C["Core + relevant Structure/Standard + QA"]
+    B -->|create/update| D["Core + relevant Structure/Standard/Template + QA"]
+    B -->|standard change| E["Test Governance + affected tests"]
+    C --> F["Report findings"]
+    D --> G["Write and read back"]
+    E --> H["Plan, execute, report, activate, verify"]
 ```
 
-The core is shared. Each task loads only one relevant module unless an explicit cross-module relation is required.
+For Musiklernen, the shared Structure distinguishes:
 
-## Quality gates
+| Card type | Purpose | Property rule |
+|---|---|---|
+| Log | Real, dated practice, lesson, performance or competition event | Log Type and event date required |
+| Wissenskarte | Reusable musical knowledge or skill | Log Type empty; date normally empty |
+| Lernsystem | Higher-level competencies, goals, priorities and feedback loop | Log Type and date empty |
 
-1. **Input gate:** clarify missing information that would materially change the result.
-2. **Routing gate:** select a supported card type and active standard version.
-3. **Draft validation:** check headings, properties, approved values and relations.
-4. **Final QA:** evaluate the complete draft against acceptance criteria.
-5. **Post-write verification:** confirm that the persisted card matches the validated draft.
+The active Lernsystem route uses **MKA Musiklernen Structure + MKA Core QA**. Previously drafted separate Lernsystem Structure, Standard, Template, QA and Tests are obsolete. Wissenskarte has its own active modules.
 
-## Versioning and migration
+## Change lifecycle
 
-Active standards and legacy standards are separated. A legacy rule may remain available for interpreting existing cards, but it must not silently influence new content. Rule changes trigger targeted regression tests for affected modules before the active route is updated.
+```mermaid
+flowchart TD
+    P["Rule or router change"] --> T["Test Plan"]
+    T --> X["QA and affected regression cases"]
+    X --> R["Execution-specific Test Report"]
+    R -->|approved| A["Activate version"]
+    A --> V["Read back route and properties"]
+    V --> L["Retain prior version as Legacy"]
+```
 
-## Security and privacy boundary
+The live governance distinguishes `Stand` (actual edit date) from `Version` (substantive rule version). A draft passes required QA and regression before activation. A failed post-activation check cannot be reported as successful activation. A factual edit to one card does not automatically require regression.
 
-Credentials are provided only at runtime and are never stored in the repository. Public examples contain reduced rules and anonymised data. The production Heptabase workspace, personal practice records and complete MKA standards remain outside the public project.
+## Public boundary
+
+The repository's reduced validator does not load the private Index, invoke an LLM, call Heptabase MCP, verify native tables or prove all active modules pass regression. Those claims require the corresponding live reports.

@@ -1,5 +1,7 @@
 # End-to-End Example: Repertoire Card
 
+> Historical public demo from the initial portfolio version. It does not represent the complete active Repertoire template or a live MCP execution as of 2026-09-22.
+
 This reduced example demonstrates the workflow without connecting to a private Heptabase workspace.
 
 ## 1. User request

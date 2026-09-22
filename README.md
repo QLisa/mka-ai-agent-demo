@@ -1,106 +1,62 @@
-# MKA – AI Agent for Music Knowledge Management
+# MKA — Music Knowledge and Learning Agent
 
-MKA is a modular AI agent for creating, validating and maintaining structured music knowledge, repertoire data and practice workflows in Heptabase.
+**Portfolio case study · Personal project · Started 2026**
 
-This repository is a privacy-safe portfolio case study. It demonstrates the architecture, workflow and quality-assurance approach without publishing private notes, credentials or the complete production rule set.
+MKA is an AI-assisted system for managing music knowledge and learning workflows in Heptabase. A central index selects active, task-specific standards; the relevant modules guide card creation or review; quality checks run before changes are written; and stored cards are read back for verification. The system also distinguishes learning events, reusable knowledge and learning-system models.
 
-## The problem
+> **Public scope:** Architecture, representative workflows, testing methodology and a small offline Python validator. The private Heptabase knowledge base and full operational standards are not included. The Python code is an illustrative component, not the production MKA agent or its MCP integration.
 
-Music-related knowledge is distributed across repertoire notes, practice logs, musicians, music history and learning materials. As the knowledge base grows, manually maintaining consistent structures, metadata, relationships and naming conventions becomes increasingly difficult.
+## The problem and design
 
-## The solution
+One growing music workspace needs consistent repertoire, musician, music-history, theory and learning records. Different card types require different properties and structures. I designed a **single active router** (MKA Index), shared rules (Core), and modules for each supported domain. Search/review loads fewer modules than create/update. Changing a standard invokes test governance and affected regression cases. Historical sources remain inactive.
 
-MKA converts natural-language requests into controlled workflows. It identifies the requested card type, loads only the applicable standards, generates structured content, runs validation and quality checks, and communicates with Heptabase through the Model Context Protocol (MCP).
+## Current scope
 
-## Key features
+| Area | Current design |
+|---|---|
+| Repertoire and musicians | Separate structure, standard, template, QA and test responsibilities |
+| Music history | Shared rules plus Epoche or Periode modules |
+| Logs | Shared Log rules plus Practice, Lesson, Performance or Competition rules |
+| Music theory | Dedicated Musiktheorie route |
+| Music learning | Log (dated event), Wissenskarte (reusable knowledge/skill), Lernsystem (competency or feedback model) |
+| Lernsystem | Shared Musiklernen Structure and Core QA; no separate active Lernsystem standard or template |
 
-- Modular routing for repertoire, musician, music-history and log workflows
-- Heptabase integration through MCP
-- Selective loading of task-specific rules
-- Validation of structure, metadata, naming and relations
-- Multi-stage quality assurance and post-write verification
-- Regression tests for changes to shared rules
-- Versioned standards with active and legacy separation
-- Automated practice-planning and progress-documentation workflows
+The routing matrix is maintained in the private MKA Index. This table is a portfolio summary, not an execution standard.
 
-## Architecture
+## How it works
 
 ```mermaid
 flowchart TD
-    U["Natural-language request"] --> A["MKA agent"]
-    A --> R["Module routing"]
-    R --> S["Applicable standards"]
-    S --> G["Structured generation"]
-    G --> Q["QA and validation"]
-    Q --> M["Heptabase via MCP"]
-    M --> V["Post-write verification"]
+    U["User request"] --> I["Active MKA Index"]
+    I --> R["Relevant active modules"]
+    R --> D["Draft or review"]
+    D --> Q["Card QA"]
+    Q -->|pass| H["Heptabase via MCP"]
+    Q -->|issues| D
+    H --> V["Read-back verification"]
 ```
 
-See [Architecture](docs/architecture.md) for component responsibilities and boundaries.
+For a **standard change**, test governance selects affected cases, records a Test Plan and a Test Report, and requires a read-back after activation. See [architecture and routing](docs/architecture.md).
 
-## End-to-end example
+## Representative workflows
 
-The public example shows how a request for a Bach repertoire card is routed, generated and validated before a simulated write operation.
+1. [Classify music-learning content](examples/music-learning-workflow.md): decide whether an observation belongs to a Log, Wissenskarte or Lernsystem.
+2. [Repertoire card example](examples/end-to-end-repertoire-card.md): earlier reduced public draft. Retained as a historical illustration, not the complete current template.
 
-See [Repertoire card workflow](examples/end-to-end-repertoire-card.md).
+## How it is tested
 
-## Testing
+MKA separates **card QA** from **regression tests**. A rule or router change requires a Test Plan, an execution-specific Test Report, evidence for each case and post-activation verification. A normal card build uses applicable QA without implying full-system regression.
 
-The public test suite validates a representative subset of the production behaviour:
+- [Testing strategy](tests/TESTING_STRATEGY.md)
+- [Recorded evidence and limits](tests/TEST_RESULTS.md)
+- Run the **limited offline demo**: `python -m unittest discover -s tests -v`
 
-- routing by card type;
-- rejection of unsupported metadata values;
-- detection of missing required sections;
-- exclusion of legacy standards from active workflows;
-- successful validation of a conforming repertoire card.
+The Python suite verifies only its coded demonstration rules; its pass count does not certify the live MKA system.
 
-Run the tests with:
+## My contributions
 
-```bash
-python -m unittest discover -s tests -v
-```
+I defined card-type boundaries and modular responsibilities, designed the single-entry routing and rule ownership, specified properties and relations, introduced active/legacy version control and post-write verification, and designed acceptance criteria and regression governance. I reviewed stored outcomes and corrected requirements when tests or cards revealed mismatches. See [contributions and evidence](docs/contributions.md).
 
-See [Testing strategy](tests/TESTING_STRATEGY.md) and [Test results](tests/TEST_RESULTS.md).
+## Reference and privacy
 
-## Repository structure
-
-```text
-mka-ai-agent/
-├── README.md
-├── docs/
-│   └── architecture.md
-├── examples/
-│   └── end-to-end-repertoire-card.md
-├── src/
-│   ├── __init__.py
-│   └── public_validator.py
-└── tests/
-    ├── TESTING_STRATEGY.md
-    ├── TEST_RESULTS.md
-    └── test_public_validator.py
-```
-
-## My contribution
-
-- Requirements analysis and domain modelling
-- Modular agent and rule architecture
-- Workflow and interface design
-- Acceptance criteria and regression-test design
-- Metadata and content validation
-- Migration and legacy strategy
-- Iterative validation with real music-learning workflows
-
-## Privacy and scope
-
-The public repository intentionally excludes:
-
-- Heptabase credentials and connection details;
-- private practice logs and personal information;
-- complete production prompts and proprietary rules;
-- raw workspace exports.
-
-All examples use public-domain repertoire information and reduced demonstration rules. The validator is a standalone public demonstration, not the complete production agent.
-
-## Status
-
-Active personal project, started in 2026. The architecture continues to evolve through new workflows, acceptance tests and controlled rule migrations.
+Checked against live **MKA Index v2.10**, **MKA Test Governance v1.3** and **MKA Musiklernen Structure v1.0** on **2026-09-22**. These references can change. Private notes, credentials and full standards are absent.

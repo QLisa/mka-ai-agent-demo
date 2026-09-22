@@ -1,26 +1,22 @@
-# Test Results
+# Test results and evidence boundary
 
-This file records actual executions of the public demonstration suite. It must not be updated with estimated or invented results.
+## Public offline demo
 
-## Latest execution
+Executed on **2026-09-22** with `python -m unittest discover -s tests -v`.
 
-**Date:** 2026-09-05  
-**Environment:** Python standard-library `unittest` runner  
-**Command:** `python -m unittest discover -s tests -v`
-
-| Test area | Passed | Failed |
+| Suite | Passed | Failed |
 |---|---:|---:|
-| Repertoire validation | 4 | 0 |
-| Routing | 2 | 0 |
-| Standard selection | 1 | 0 |
+| Reduced Repertoire validation | 4 | 0 |
+| Simplified routing | 2 | 0 |
+| Active/legacy selection | 1 | 0 |
 | **Total** | **7** | **0** |
 
-```text
-Ran 7 tests in 0.001s
+The hard-coded schema is smaller than the live standards. These passes do **not** certify a production MKA card.
 
-OK
-```
+## Live MKA evidence read for this update
 
-## Interpretation
+The private **“MKA Test Report — Musiklernen Datenmodell und Lernsystem-Routing v1.0 — 2026-09-22”** was read on 2026-09-22. It records `Durchführungsstatus=Abgeschlossen` and `Freigabe=Freigegeben`, refers to its Test Plan, lists tested versions and cases ML-01 to ML-09, and documents both pre-activation results and post-activation read-back of Index v2.10, Test Governance v1.3 and Musiklernen Structure v1.0. Separate obsolete Lernsystem modules were excluded.
 
-All implemented public demonstration cases passed. This result verifies only the reduced offline validator contained in this repository. It does not claim coverage of the complete production rules or live Heptabase/MCP integration.
+This is evidence recorded in a **private live system**, not an independently reproducible test run from the public repository. The public documentation does not expose personal card contents or credentials.
+
+Proposed cases, card QA, pre-activation approval and completed activation are distinct outcomes. Future results should state exact scope and execution date.
